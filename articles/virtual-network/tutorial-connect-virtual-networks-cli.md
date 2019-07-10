@@ -1,21 +1,22 @@
 ---
 title: Connect virtual networks with virtual network peering - Azure CLI | Microsoft Docs
-description: Learn how to connect virtual networks with virtual network peering.
+description: In this article, you learn how to connect virtual networks with virtual network peering, using the Azure CLI.
 services: virtual-network
 documentationcenter: virtual-network
-author: jimdial
-manager: jeconnoc
+author: KumudD
+manager: twooley
 editor: ''
 tags: azure-resource-manager
+Customer intent: I want to connect two virtual networks so that virtual machines in one virtual network can communicate with virtual machines in the other virtual network.
 
 ms.assetid: 
 ms.service: virtual-network
 ms.devlang: azurecli
-ms.topic:
+ms.topic: article
 ms.tgt_pltfrm: virtual-network
 ms.workload: infrastructure
 ms.date: 03/13/2018
-ms.author: jdial
+ms.author: kumud
 ms.custom:
 ---
 
@@ -23,27 +24,26 @@ ms.custom:
 
 You can connect virtual networks to each other with virtual network peering. Once virtual networks are peered, resources in both virtual networks are able to communicate with each other, with the same latency and bandwidth as if the resources were in the same virtual network. In this article, you learn how to:
 
-> [!div class="checklist"]
-> * Create two virtual networks
-> * Connect two virtual networks with a virtual network peering
-> * Deploy a virtual machine (VM) into each virtual network
-> * Communicate between VMs
+* Create two virtual networks
+* Connect two virtual networks with a virtual network peering
+* Deploy a virtual machine (VM) into each virtual network
+* Communicate between VMs
 
 If you don't have an Azure subscription, create a [free account](https://azure.microsoft.com/free/?WT.mc_id=A261C142F) before you begin.
 
 [!INCLUDE [cloud-shell-try-it.md](../../includes/cloud-shell-try-it.md)]
 
-If you choose to install and use the CLI locally, this quickstart requires that you are running the Azure CLI version 2.0.28 or later. To find the version, run `az --version`. If you need to install or upgrade, see [Install Azure CLI 2.0](/cli/azure/install-azure-cli). 
+If you choose to install and use the CLI locally, this article requires that you are running the Azure CLI version 2.0.28 or later. To find the version, run `az --version`. If you need to install or upgrade, see [Install Azure CLI](/cli/azure/install-azure-cli). 
 
 ## Create virtual networks
 
-Before creating a virtual network, you have to create a resource group for the virtual network, and all other resources created in this article. Create a resource group with [az group create](/cli/azure/group#az_group_create). The following example creates a resource group named *myResourceGroup* in the *eastus* location.
+Before creating a virtual network, you have to create a resource group for the virtual network, and all other resources created in this article. Create a resource group with [az group create](/cli/azure/group). The following example creates a resource group named *myResourceGroup* in the *eastus* location.
 
 ```azurecli-interactive 
 az group create --name myResourceGroup --location eastus
 ```
 
-Create a virtual network with [az network vnet create](/cli/azure/network/vnet#az_network_vnet_create). The following example creates a virtual network named *myVirtualNetwork1* with the address prefix *10.0.0.0/16*.
+Create a virtual network with [az network vnet create](/cli/azure/network/vnet). The following example creates a virtual network named *myVirtualNetwork1* with the address prefix *10.0.0.0/16*.
 
 ```azurecli-interactive 
 az network vnet create \
@@ -67,7 +67,7 @@ az network vnet create \
 
 ## Peer virtual networks
 
-Peerings are established between virtual network IDs, so you must first get the ID of each virtual network with [az network vnet show](/cli/azure/network/vnet#az_network_vnet_show) and store the ID in a variable.
+Peerings are established between virtual network IDs, so you must first get the ID of each virtual network with [az network vnet show](/cli/azure/network/vnet) and store the ID in a variable.
 
 ```azurecli-interactive
 # Get the id for myVirtualNetwork1.
@@ -84,14 +84,14 @@ vNet2Id=$(az network vnet show \
   --out tsv)
 ```
 
-Create a peering from *myVirtualNetwork1* to *myVirtualNetwork2* with [az network vnet peering create](/cli/azure/network/vnet/peering#az_network_vnet_peering_create). If the `--allow-vnet-access` parameter is not specified, a peering is established, but no communication can flow through it.
+Create a peering from *myVirtualNetwork1* to *myVirtualNetwork2* with [az network vnet peering create](/cli/azure/network/vnet/peering). If the `--allow-vnet-access` parameter is not specified, a peering is established, but no communication can flow through it.
 
 ```azurecli-interactive
 az network vnet peering create \
   --name myVirtualNetwork1-myVirtualNetwork2 \
   --resource-group myResourceGroup \
   --vnet-name myVirtualNetwork1 \
-  --remote-vnet-id $vNet2Id \
+  --remote-vnet $vNet2Id \
   --allow-vnet-access
 ```
 
@@ -102,11 +102,11 @@ az network vnet peering create \
   --name myVirtualNetwork2-myVirtualNetwork1 \
   --resource-group myResourceGroup \
   --vnet-name myVirtualNetwork2 \
-  --remote-vnet-id $vNet1Id \
+  --remote-vnet $vNet1Id \
   --allow-vnet-access
 ```
 
-In the output returned after the previous command executes, you see that the **peeringState** is *Connected*. Azure also changed the peering state of the *myVirtualNetwork1-myVirtualNetwork2* peering to *Connected*. Confirm that the peering state for the *myVirtualNetwork1-myVirtualNetwork2* peering changed to *Connected* with [az network vnet peering show](/cli/azure/network/vnet/peering#az_network_vnet_peering_show).
+In the output returned after the previous command executes, you see that the **peeringState** is *Connected*. Azure also changed the peering state of the *myVirtualNetwork1-myVirtualNetwork2* peering to *Connected*. Confirm that the peering state for the *myVirtualNetwork1-myVirtualNetwork2* peering changed to *Connected* with [az network vnet peering show](/cli/azure/network/vnet/peering).
 
 ```azurecli-interactive
 az network vnet peering show \
@@ -124,7 +124,7 @@ Create a VM in each virtual network so that you can communicate between them in 
 
 ### Create the first VM
 
-Create a VM with [az vm create](/cli/azure/vm#az_vm_create). The following example creates a VM named *myVm1* in the *myVirtualNetwork1* virtual network. If SSH keys do not already exist in a default key location, the command creates them. To use a specific set of keys, use the `--ssh-key-value` option. The `--no-wait` option creates the VM in the background, so you can continue to the next step.
+Create a VM with [az vm create](/cli/azure/vm). The following example creates a VM named *myVm1* in the *myVirtualNetwork1* virtual network. If SSH keys do not already exist in a default key location, the command creates them. To use a specific set of keys, use the `--ssh-key-value` option. The `--no-wait` option creates the VM in the background, so you can continue to the next step.
 
 ```azurecli-interactive
 az vm create \
@@ -166,7 +166,7 @@ The VM takes a few minutes to create. After the VM is created, the Azure CLI sho
 }
 ```
 
-Take note of the **publicIpAddress**. This address is used to access the VM from the Internet in a later step.
+Take note of the **publicIpAddress**. This address is used to access the VM from the internet in a later step.
 
 ## Communicate between VMs
 
@@ -188,36 +188,14 @@ Close the SSH session to the *myVm2* VM.
 
 ## Clean up resources
 
-When no longer needed, use [az group delete](/cli/azure/group#az_group_delete) to remove the resource group and all of the resources it contains.
+When no longer needed, use [az group delete](/cli/azure/group) to remove the resource group and all of the resources it contains.
 
 ```azurecli-interactive 
 az group delete --name myResourceGroup --yes
 ```
 
-**<a name="register"></a>Register for the global virtual network peering preview**
-
-Peering virtual networks in the same region is generally available. Peering virtual networks in different regions is currently in preview. See [Virtual network updates](https://azure.microsoft.com/updates/?product=virtual-network) for available regions. To peer virtual networks across regions, you must first register for the preview, by completing the following steps (within the subscription each virtual network you want to peer is in):
-
-1. Register for the preview by entering the following commands:
-
-  ```azurecli-interactive
-  az feature register --name AllowGlobalVnetPeering --namespace Microsoft.Network
-  az provider register --name Microsoft.Network
-  ```
-
-2. Confirm that you are registered for the preview by entering the following command:
-
-  ```azurecli-interactive
-  az feature show --name AllowGlobalVnetPeering --namespace Microsoft.Network
-  ```
-
-  If you attempt to peer virtual networks in different regions before the **RegistrationState** output you receive after entering the previous command is **Registered** for both subscriptions, peering fails.
-
 ## Next steps
 
-In this article, you learned how to connect two networks with virtual network peering. In this article, you learned how to connect two networks, in the same Azure location, with virtual network peering. You can also peer virtual networks in [different regions](#register), in [different Azure subscriptions](create-peering-different-subscriptions.md#portal) and you can create [hub and spoke network designs](/azure/architecture/reference-architectures/hybrid-networking/hub-spoke?toc=%2fazure%2fvirtual-network%2ftoc.json#vnet-peering) with peering. Before peering production virtual networks, it's recommended that you thoroughly familiarize yourself with the [peering overview](virtual-network-peering-overview.md), [manage peering](virtual-network-manage-peering.md), and [virtual network limits](../azure-subscription-service-limits.md?toc=%2fazure%2fvirtual-network%2ftoc.json#azure-resource-manager-virtual-networking-limits).
+In this article, you learned how to connect two networks in the same Azure region, with virtual network peering. You can also peer virtual networks in different [supported regions](virtual-network-manage-peering.md#cross-region) and in [different Azure subscriptions](create-peering-different-subscriptions.md#cli), as well as create [hub and spoke network designs](/azure/architecture/reference-architectures/hybrid-networking/hub-spoke?toc=%2fazure%2fvirtual-network%2ftoc.json#vnet-peering) with peering. To learn more about virtual network peering, see [Virtual network peering overview](virtual-network-peering-overview.md) and [Manage virtual network peerings](virtual-network-manage-peering.md).
 
-You can [connect your own computer to a virtual network](../vpn-gateway/vpn-gateway-howto-point-to-site-resource-manager-portal.md?toc=%2fazure%2fvirtual-network%2ftoc.json) through a VPN, and interact with resources in a virtual network, or in peered virtual networks. Continue to script samples for reusable scripts to complete many of the tasks covered in the virtual network articles.
-
-> [!div class="nextstepaction"]
-> [Virtual network script samples](../networking/cli-samples.md?toc=%2fazure%2fvirtual-network%2ftoc.json)
+You can [connect your own computer to a virtual network](../vpn-gateway/vpn-gateway-howto-point-to-site-resource-manager-portal.md?toc=%2fazure%2fvirtual-network%2ftoc.json) through a VPN, and interact with resources in a virtual network, or in peered virtual networks. For reusable scripts to complete many of the tasks covered in the virtual network articles, see [script samples](cli-samples.md).

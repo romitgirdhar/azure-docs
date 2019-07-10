@@ -3,18 +3,13 @@ title: Introduction to Azure Advisor | Microsoft Docs
 description: Use Azure Advisor to optimize your Azure deployments.
 services: advisor
 documentationcenter: NA
-author: KumudD
-manager: carmonm
-editor: ''
-
-ms.assetid: 
+author: kasparks
 ms.service: advisor
-ms.devlang: NA
 ms.topic: article
 ms.tgt_pltfrm: NA
 ms.workload: NA
-ms.date: 11/16/2016
-ms.author: kumud
+ms.date: 02/01/2019
+ms.author: kasparks
 ---
 
 # Introduction to Azure Advisor
@@ -40,9 +35,6 @@ The Advisor dashboard displays personalized recommendations for all your subscri
 
   ![Advisor recommendation types](./media/advisor-overview/advisor-dashboard.png)
 
-> [!NOTE]
-> To use Azure Advisor with a subscription, a subscription *Owner* must launch the Advisor dashboard.  This action registers the subscription with Advisor.  From that point on, any subscription *Owner*, *Contributor*, or *Reader* can access the Advisor recommendations for the subscription. 
-
 You can click a category to display the list of recommendations within that category, and select a recommendation to learn more about it.  You can also learn about actions that you can perform to take advantage of an opportunity or resolve an issue.
 
 ![Advisor recommendation category](./media/advisor-overview/advisor-ha-category-example.png) 
@@ -59,12 +51,14 @@ You can access Advisor through the [Azure portal](https://aka.ms/azureadvisordas
 You can also view Advisor recommendations through the virtual machine resource interface. Choose a virtual machine, and then scroll to Advisor recommendations in the menu. 
 
 ### What permissions do I need to access Advisor?
-
-To obtain Advisor recommendations for a subscription, you must first register your subscription with Advisor. A subscription is registered when a subscription *Owner* launches the Advisor dashboard. This is a one-time operation. After the subscription is registered, you can access Advisor recommendations as *Owner*, *Contributor*, or *Reader* of a subscription.
+ 
+You can access Advisor recommendations as *Owner*, *Contributor*, or *Reader* of a subscription.
 
 ### What resources does Advisor provide recommendations for?
 
-Advisor provides recommendations for virtual machines, availability sets, application gateways, App Services, SQL servers, SQL databases, and Redis Cache.
+Advisor provides recommendations for Application Gateway, App Services, availability sets, Azure Cache, Azure Data Factory, Azure Database for MySQL, Azure Database for PostgreSQL, Azure Database for MariaDB, Azure ExpressRoute, Azure Cosmos DB, Azure public IP addresses, SQL Data Warehouse, SQL servers, storage accounts, Traffic Manager profiles, and virtual machines.
+
+Azure Advisor also includes your recommendations from [Azure Security Center](https://docs.microsoft.com/azure/security-center/security-center-recommendations) which may include recommendations for additional resource types.
 
 ### Can I postpone or dismiss a recommendation?
 

@@ -1,17 +1,16 @@
 ---
-title: Create an application gateway with URL path-based routing rules - Azure portal | Microsoft Docs
+title: Create an application gateway with URL path-based routing rules - Azure portal
 description: Learn how to create URL path-based routing rules for an application gateway and virtual machine scale set using the Azure portal.
 services: application-gateway
-author: davidmu1
-manager: timlt
-editor: tysonn
+author: vhorne
+manager: jpconnock
 tags: azure-resource-manager
 
 ms.service: application-gateway
 ms.topic: article
 ms.workload: infrastructure-services
-ms.date: 01/26/2018
-ms.author: davidmu
+ms.date: 3/26/2018
+ms.author: victorh
 
 ---
 # Create an application gateway with path-based routing rules using the Azure portal
@@ -31,9 +30,11 @@ In this article, you learn how to:
 
 If you don't have an Azure subscription, create a [free account](https://azure.microsoft.com/free/?WT.mc_id=A261C142F) before you begin.
 
+[!INCLUDE [updated-for-az](../../includes/updated-for-az.md)]
+
 ## Log in to Azure
 
-Log in to the Azure portal at [http://portal.azure.com](http://portal.azure.com)
+Log in to the Azure portal at [https://portal.azure.com](https://portal.azure.com)
 
 ## Create an application gateway
 
@@ -43,26 +44,26 @@ A virtual network is needed for communication between the resources that you cre
 2. Select **Networking** and then select **Application Gateway** in the Featured list.
 3. Enter these values for the application gateway:
 
-    - *myAppGateway* - for the name of the application gateway.
-    - *myResourceGroupAG* - for the new resource group.
+   - *myAppGateway* - for the name of the application gateway.
+   - *myResourceGroupAG* - for the new resource group.
 
-    ![Create new application gateway](./media/application-gateway-create-url-route-portal/application-gateway-create.png)
+     ![Create new application gateway](./media/application-gateway-create-url-route-portal/application-gateway-create.png)
 
 4. Accept the default values for the other settings and then click **OK**.
 5. Click **Choose a virtual network**, click **Create new**, and then enter these values for the virtual network:
 
-    - *myVNet* - for the name of the virtual network.
-    - *10.0.0.0/16* - for the virtual network address space.
-    - *myAGSubnet* - for the subnet name.
-    - *10.0.0.0/24* - for the subnet address space.
+   - *myVNet* - for the name of the virtual network.
+   - *10.0.0.0/16* - for the virtual network address space.
+   - *myAGSubnet* - for the subnet name.
+   - *10.0.0.0/24* - for the subnet address space.
 
-    ![Create virtual network](./media/application-gateway-create-url-route-portal/application-gateway-vnet.png)
+     ![Create virtual network](./media/application-gateway-create-url-route-portal/application-gateway-vnet.png)
 
 6. Click **OK** to create the virtual network and subnet.
 7. Click **Choose a public IP address**, click **Create new**, and then enter the name of the public IP address. In this example, the public IP address is named *myAGPublicIPAddress*. Accept the default values for the other settings and then click **OK**.
 8. Accept the default values for the Listener configuration, leave the Web application firewall disabled, and then click **OK**.
 9. Review the settings on the summary page, and then click **OK** to create the network resources and the application gateway. It may take several minutes for the application gateway to be created, wait until
-the deployment finishes successfully before moving on to the next section.
+   the deployment finishes successfully before moving on to the next section.
 
 ### Add a subnet
 
@@ -101,8 +102,8 @@ In this example, you create three virtual machines to be used as backend servers
 2. Run the following command to install IIS on the virtual machine: 
 
     ```azurepowershell-interactive
-    $publicSettings = @{ "fileUris" = (,"https://raw.githubusercontent.com/davidmu1/samplescripts/master/appgatewayurl.ps1");  "commandToExecute" = "powershell -ExecutionPolicy Unrestricted -File appgatewayurl.ps1" }
-    Set-AzureRmVMExtension `
+    $publicSettings = @{ "fileUris" = (,"https://raw.githubusercontent.com/Azure/azure-docs-powershell-samples/master/application-gateway/iis/appgatewayurl.ps1");  "commandToExecute" = "powershell -ExecutionPolicy Unrestricted -File appgatewayurl.ps1" }
+    Set-AzVMExtension `
       -ResourceGroupName myResourceGroupAG `
       -Location eastus `
       -ExtensionName IIS `
@@ -113,7 +114,7 @@ In this example, you create three virtual machines to be used as backend servers
       -Settings $publicSettings
     ```
 
-3. Create two more virtual machines and install IIS using the steps that you just finished. Enter the names of *myVM2* and *myVM3* for the names and for the values of VMName in Set-AzureRmVMExtension.
+3. Create two more virtual machines and install IIS using the steps that you just finished. Enter the names of *myVM2* and *myVM3* for the names and for the values of VMName in Set-AzVMExtension.
 
 ## Create backend pools with the virtual machines
 
@@ -139,8 +140,8 @@ In this example, you create three virtual machines to be used as backend servers
 
 1. Click **Rules** and then click **Path-based**.
 2. Enter *rule2* for the name.
-3. Enter *Images* for the name of the first path. Enter */images/** for the path. Select **imagesBackendPool** for the backend pool.
-4. Enter *Video* for the name of the second path. Enter */video/** for the path. Select **videoBackendPool** for the backend pool.
+3. Enter *Images* for the name of the first path. Enter */images/*\* for the path. Select **imagesBackendPool** for the backend pool.
+4. Enter *Video* for the name of the second path. Enter */video/*\* for the path. Select **videoBackendPool** for the backend pool.
 
     ![Create a path-based rule](./media/application-gateway-create-url-route-portal/application-gateway-route-rule.png)
 
@@ -152,11 +153,11 @@ In this example, you create three virtual machines to be used as backend servers
 
     ![Record application gateway public IP address](./media/application-gateway-create-url-route-portal/application-gateway-record-ag-address.png)
 
-2. Copy the public IP address, and then paste it into the address bar of your browser. Such as, http://http://40.121.222.19.
+2. Copy the public IP address, and then paste it into the address bar of your browser. Such as, http:\//40.121.222.19.
 
     ![Test base URL in application gateway](./media/application-gateway-create-url-route-portal/application-gateway-iistest.png)
 
-3. Change the URL to http://&lt;ip-address&gt;:8080/video/test.htm, substituting &lt;ip-address&gt; with your IP address, and you should see something like the following example:
+3. Change the URL to http://&lt;ip-address&gt;:8080/images/test.htm, substituting &lt;ip-address&gt; with your IP address, and you should see something like the following example:
 
     ![Test images URL in application gateway](./media/application-gateway-create-url-route-portal/application-gateway-iistest-images.png)
 
